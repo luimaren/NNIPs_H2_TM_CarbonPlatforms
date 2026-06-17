@@ -1,0 +1,23 @@
+[metadata]
+name = NNIPs_H2_TM_CarbonPlatforms
+version = 0.0.1
+author = Luis Martín Encinar
+author_email = luis.martin.encinar@uva.es
+description = ""
+long_description = file: README.md
+license = BSD 3-Clause License
+keywords = MLIPs, atomistic simulations, H2 storage, carbon platforms, transition metals, Fine Tuning
+
+[options]
+packages = find:   # Busca automaticamente los modulos
+package_dir =
+    = src
+python_requires = >=3.10
+install_requires =
+    numpy
+    matplotlib
+    scipy
+    pandas
+    torch
+    ase
+    matscipy
