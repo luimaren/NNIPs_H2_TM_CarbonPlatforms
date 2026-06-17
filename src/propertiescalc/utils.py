@@ -1,6 +1,6 @@
 import numpy as np
 
-def g_r_2d_all_pairs(traj, rmax, nbins):
+def gr_2d_partial(traj, rmax, nbins):
 
     dr = rmax / nbins
     bins = np.linspace(0.0, rmax, nbins+1)
@@ -94,7 +94,7 @@ def g_r_2d_all_pairs(traj, rmax, nbins):
 
 import numpy as np
 
-def g_r_2d_tot(traj, rmax, nbins):
+def gr_2d_tot(traj, rmax, nbins):
 
     dr = rmax / nbins
     bins = np.linspace(0.0, rmax, nbins+1)
