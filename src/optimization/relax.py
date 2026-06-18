@@ -3,6 +3,13 @@ from ase.optimize import BFGS, FIRE, LBFGSLineSearch, FIRE2
 from ase.io import write, read
 from ase.filters import UnitCellFilter
 
+
+def remove_if_exists(*filenames):
+    """Elimina los ficheros indicados si existen."""
+    for fname in filenames:
+        if os.path.isfile(fname):
+            os.remove(fname)
+
 def relax_structure(atoms, calculator, optimizer="BFGS",
                      fmax=0.001, output_file="relax", steps=10000,
                      relax_cell=False):
