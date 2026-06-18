@@ -3,13 +3,6 @@ from ase.optimize import BFGS, FIRE, LBFGSLineSearch, FIRE2
 from ase.io import write, read
 from ase.filters import UnitCellFilter
 
-
-def remove_if_exists(*filenames):
-    """Elimina los ficheros indicados si existen."""
-    for fname in filenames:
-        if os.path.isfile(fname):
-            os.remove(fname)
-
 def relax_structure(atoms, calculator, optimizer="BFGS",
                      fmax=0.001, output_file="relax", steps=10000,
                      relax_cell=False):
@@ -17,6 +10,11 @@ def relax_structure(atoms, calculator, optimizer="BFGS",
     Relaja una estructura con distintos optimizadores de ASE.
     Si relax_cell=True, también se relaja la celda (volumen y forma).
     """
+    def remove_if_exists(*filenames):
+        """Elimina los ficheros indicados si existen."""
+        for fname in filenames:
+            if os.path.isfile(fname):
+                os.remove(fname)
 
     atoms = atoms.copy()
     atoms.calc = calculator
@@ -34,8 +32,8 @@ def relax_structure(atoms, calculator, optimizer="BFGS",
     # Nombres de archivos
     suffix = "_cell" if relax_cell else ""
     traj_file = f"{output_file}_{optimizer}{suffix}.traj"
-    log_file = f"{output_file}_{optimizer}{suffix}.log"
-    xyz_file = f"{output_file}_{optimizer}{suffix}.xyz"
+    log_file  = f"{output_file}_{optimizer}{suffix}.log"
+    xyz_file  = f"{output_file}_{optimizer}{suffix}.xyz"
     full_xyz_file = f"{output_file}_{optimizer}{suffix}_full.xyz"
 
     # Eliminar archivos antiguos
@@ -57,4 +55,4 @@ def relax_structure(atoms, calculator, optimizer="BFGS",
     images = read(traj_file, ":")
     write(full_xyz_file, images)
 
-    return atoms  
+    return atoms
