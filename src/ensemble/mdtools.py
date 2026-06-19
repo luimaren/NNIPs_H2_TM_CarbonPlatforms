@@ -18,7 +18,7 @@ def NoseHooverMD(
     nsteps,
     init_temp=None,
     timestep_fs=1.0,
-    tdamp_fs=1000.0,    
+    tdamp_fs=100.0,    
     log_interval=100,    
 ):
     conf = init_conf.copy()
