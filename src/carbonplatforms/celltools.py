@@ -4,52 +4,11 @@ import numpy as np
 import ase.io
 from ase import Atoms
 from ase.io import read, write
-
+# Ruta a la carpeta data/ dentro del paquete
 _DATA_DIR = pathlib.Path(__file__).parent / "data"
-
-
-def build_gamma_graphdiyne():
-    """
-    Unit cell of gamma-graphdiyne (γ-GDY) extracted from a relaxed 2x2 supercell.
-    
-    cell = np.array([
-        [9.45543695, 0.00269498, 0.0],
-        [4.72771848, 8.18872055, 0.0],
-        [0.0,        0.0,        14.0022172],
-    ])
-    positions = np.array([
-        [ 5.65751585,  4.09287801,  7.00333486],  
-        [ 4.26171852,  4.09346746,  7.00404853],
-        [ 3.03035092,  4.09922335,  7.00438148], 
-        [ 8.51993135,  4.09599095,  7.00234908],  
-        [ 9.91593055,  4.09508536,  7.00238103], 
-        [11.14736447,  4.08858695,  7.00254780], 
-        [ 6.37256632,  5.33238265,  7.00190738],  
-        [ 5.67526647,  6.54138322,  6.99990413],  
-        [ 5.06116713,  7.60867547,  6.99825265], 
-        [ 7.80349757,  5.33423333,  7.00229545], 
-        [ 8.49886400,  6.54474266,  7.00223005],  
-        [ 9.10990186,  7.61395232,  7.00239376],  
-        [ 6.37414806,  2.85435758,  7.00325852],  
-        [ 5.67907334,  1.64387258,  7.00384310], 
-        [ 5.06868970,  0.57443803,  7.00410623], 
-        [ 7.80504711,  2.85643116,  7.00186931],  
-        [ 8.50452430,  1.64867511,  6.99979041],  
-        [ 9.12090150,  0.58275892,  6.99804203], 
-    ])
-    gdy = Atoms(
-        symbols=['C'] * 18,
-        positions=positions,
-        cell=cell,
-        pbc=[True, True, False],
-    )
-    gdy.center(vacuum=7.5, axis=2)
-    return gdy
-
 def make_cell(material, n, method='ase'):
     """
     Genera una supercelda nxn del material indicado y la guarda en disco.
-
     Parameters
     ----------
     material : str
@@ -58,13 +17,12 @@ def make_cell(material, n, method='ase'):
         Tamaño de la supercelda (n x n x 1)
     method : str, opcional
         Solo para GRPH. 'ase' genera desde cero (default), 'mj' usa el fichero MJ.
-
     Examples
     --------
     >>> make_cell('GRPH', 4)          # grafeno desde ASE
     >>> make_cell('GRPH', 8, 'mj')    # grafeno desde fichero MJ
     >>> make_cell('BGDY', 3)
-    >>> make_cell('GDY', 2)           # γ-graphdiyne desde función interna
+    >>> make_cell('GDY', 2)
     """
     if material == 'GRPH':
         if method == 'ase':
@@ -75,8 +33,9 @@ def make_cell(material, n, method='ase'):
             unit.center()
         else:
             raise ValueError(f"Método '{method}' no reconocido para GRPH. Opciones: 'ase', 'mj'")
-
     elif material == 'BGDY':
+        # Boron-Graphdiyne
+        # Extracted from: https://pubs.rsc.org/en/content/articlelanding/2018/ta/c8ta02627k
         cell = [
             [11.8467556014, 0.0, 0.0],
             [5.9233778007, 10.2595913032, 0.0],
@@ -101,14 +60,44 @@ def make_cell(material, n, method='ase'):
         symbols = ['C'] * 12 + ['B'] * 2
         positions = [np.dot(pos, cell) for pos in positions_frac]
         unit = Atoms(symbols=symbols, positions=positions, cell=cell, pbc=[True, True, False])
-
     elif material == 'GDY':
-        unit = build_gamma_graphdiyne()   # generada internamente, sin fichero externo
 
+        cell = [
+            [9.45543695, 0.00269498, 0.0],
+            [4.72771848, 8.18872055, 0.0],
+            [0.0,        0.0,        14.0022172],
+        ]
+        positions_frac = [
+            (0.348483, 0.499704, 0.500159),
+            (0.200804, 0.499825, 0.500210),
+            (0.070202, 0.500571, 0.500234),  
+            (0.651069, 0.499985, 0.500089),
+            (0.798789, 0.499826, 0.500091),  
+            (0.929442, 0.498989, 0.500103), 
+            (0.348422, 0.651072, 0.500057), 
+            (0.200831, 0.798762, 0.499914),  
+            (0.070694, 0.929142, 0.499796),  
+            (0.499668, 0.651248, 0.500085),  
+            (0.499296, 0.799074, 0.500080), 
+            (0.498634, 0.929646, 0.500092),  
+            (0.499922, 0.348407, 0.500154),
+            (0.500323, 0.200584, 0.500196), 
+            (0.501068, 0.069985, 0.500214),  
+            (0.651151, 0.348611, 0.500055), 
+            (0.798896, 0.201072, 0.499906),  
+            (0.929190, 0.070860, 0.499781),  
+        ]
+        symbols = ['C'] * 18
+        positions = [np.dot(pos, cell) for pos in positions_frac]
+        unit = Atoms(symbols=symbols, positions=positions, cell=cell, pbc=[True, True, False])
+        
     else:
         raise ValueError(f"Material '{material}' no reconocido. Opciones: 'GRPH', 'BGDY', 'GDY'")
-
     name = f"{n}x{n}"
+    supercel = unit * [n, n, 1]
+    os.makedirs(f"{material}/{name}", exist_ok=True)
+    ase.io.write(f"{material}/{name}/{material.lower()}_{name}.xyz", supercel)
+    print(f"✔ {material} {name} — {len(supercel)} átomos")
     supercel = unit * [n, n, 1]
     os.makedirs(f"{material}/{name}", exist_ok=True)
     ase.io.write(f"{material}/{name}/{material.lower()}_{name}.xyz", supercel)
