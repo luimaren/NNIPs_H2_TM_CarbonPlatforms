@@ -5,10 +5,46 @@ import ase.io
 from ase import Atoms
 from ase.io import read, write
 
-
-# Ruta a la carpeta data/ dentro del paquete
 _DATA_DIR = pathlib.Path(__file__).parent / "data"
 
+
+def build_gamma_graphdiyne():
+    """
+    Unit cell of gamma-graphdiyne (γ-GDY) extracted from a relaxed 2x2 supercell.
+    
+    cell = np.array([
+        [9.45543695, 0.00269498, 0.0],
+        [4.72771848, 8.18872055, 0.0],
+        [0.0,        0.0,        14.0022172],
+    ])
+    positions = np.array([
+        [ 5.65751585,  4.09287801,  7.00333486],  
+        [ 4.26171852,  4.09346746,  7.00404853],
+        [ 3.03035092,  4.09922335,  7.00438148], 
+        [ 8.51993135,  4.09599095,  7.00234908],  
+        [ 9.91593055,  4.09508536,  7.00238103], 
+        [11.14736447,  4.08858695,  7.00254780], 
+        [ 6.37256632,  5.33238265,  7.00190738],  
+        [ 5.67526647,  6.54138322,  6.99990413],  
+        [ 5.06116713,  7.60867547,  6.99825265], 
+        [ 7.80349757,  5.33423333,  7.00229545], 
+        [ 8.49886400,  6.54474266,  7.00223005],  
+        [ 9.10990186,  7.61395232,  7.00239376],  
+        [ 6.37414806,  2.85435758,  7.00325852],  
+        [ 5.67907334,  1.64387258,  7.00384310], 
+        [ 5.06868970,  0.57443803,  7.00410623], 
+        [ 7.80504711,  2.85643116,  7.00186931],  
+        [ 8.50452430,  1.64867511,  6.99979041],  
+        [ 9.12090150,  0.58275892,  6.99804203], 
+    ])
+    gdy = Atoms(
+        symbols=['C'] * 18,
+        positions=positions,
+        cell=cell,
+        pbc=[True, True, False],
+    )
+    gdy.center(vacuum=7.5, axis=2)
+    return gdy
 
 def make_cell(material, n, method='ase'):
     """
@@ -28,24 +64,19 @@ def make_cell(material, n, method='ase'):
     >>> make_cell('GRPH', 4)          # grafeno desde ASE
     >>> make_cell('GRPH', 8, 'mj')    # grafeno desde fichero MJ
     >>> make_cell('BGDY', 3)
-    >>> make_cell('GDY', 2)
+    >>> make_cell('GDY', 2)           # γ-graphdiyne desde función interna
     """
-
     if material == 'GRPH':
         if method == 'ase':
             from ase.build import graphene
             unit = graphene()
-
         elif method == 'mj':
             unit = read(str(_DATA_DIR / "graphene_4x4_MJ_centered.xyz"))
             unit.center()
-
         else:
             raise ValueError(f"Método '{method}' no reconocido para GRPH. Opciones: 'ase', 'mj'")
 
     elif material == 'BGDY':
-        # Boron-Graphdiyne
-        # Extracted from: https://pubs.rsc.org/en/content/articlelanding/2018/ta/c8ta02627k
         cell = [
             [11.8467556014, 0.0, 0.0],
             [5.9233778007, 10.2595913032, 0.0],
@@ -72,8 +103,7 @@ def make_cell(material, n, method='ase'):
         unit = Atoms(symbols=symbols, positions=positions, cell=cell, pbc=[True, True, False])
 
     elif material == 'GDY':
-        unit = read(str(_DATA_DIR / "gdy_centrada.xyz"))
-        unit.center()
+        unit = build_gamma_graphdiyne()   # generada internamente, sin fichero externo
 
     else:
         raise ValueError(f"Material '{material}' no reconocido. Opciones: 'GRPH', 'BGDY', 'GDY'")
