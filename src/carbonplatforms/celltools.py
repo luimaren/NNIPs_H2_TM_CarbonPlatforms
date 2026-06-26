@@ -64,34 +64,40 @@ def make_cell(material, n, method='ase'):
         # gamma-Graphdiyne
         # Extracted from relaxed 2x2 supercell (MACE-HOC potential)
         # a = b ≈ 9.455 Å, γ ≈ 60°, 18 C atoms per unit cell
+        # Bond lengths: 1.231 Å (C≡C), 1.338 Å (C–C), 1.396 Å (sp2-sp), 1.431 Å (sp2-sp2)
         cell = np.array([
             [9.45543695, 0.00269498, 0.0],
             [4.72771848, 8.18872055, 0.0],
             [0.0,        0.0,        14.0022172],
         ])
         positions_frac = np.array([
-            (0.348483, 0.499704, 0.500159),  # sp2 (benzene)
-            (0.200804, 0.499825, 0.500210),  # sp  (C≡C inner)
-            (0.070202, 0.500571, 0.500234),  # sp  (C≡C outer)
-            (0.651069, 0.499985, 0.500089),  # sp2 (benzene)
-            (0.798789, 0.499826, 0.500091),  # sp  (C≡C inner)
-            (0.929442, 0.498989, 0.500103),  # sp  (C≡C outer)
-            (0.348422, 0.651072, 0.500057),  # sp2 (benzene)
-            (0.200831, 0.798762, 0.499914),  # sp  (C≡C inner)
-            (0.070694, 0.929142, 0.499796),  # sp  (C≡C outer)
-            (0.499668, 0.651248, 0.500085),  # sp2 (benzene)
-            (0.499296, 0.799074, 0.500080),  # sp  (C≡C inner)
-            (0.498634, 0.929646, 0.500092),  # sp  (C≡C outer)
-            (0.499922, 0.348407, 0.500154),  # sp2 (benzene)
-            (0.500323, 0.200584, 0.500196),  # sp  (C≡C inner)
-            (0.501068, 0.069985, 0.500214),  # sp  (C≡C outer)
-            (0.651151, 0.348611, 0.500055),  # sp2 (benzene)
-            (0.798896, 0.201072, 0.499906),  # sp  (C≡C inner)
-            (0.929190, 0.070860, 0.499781),  # sp  (C≡C outer)
+            (0.348483, 0.499704, 0.0),  # sp2 (benzene)
+            (0.200804, 0.499825, 0.0),  # sp  (C≡C inner)
+            (0.070202, 0.500571, 0.0),  # sp  (C≡C outer)
+            (0.651069, 0.499985, 0.0),  # sp2 (benzene)
+            (0.798789, 0.499826, 0.0),  # sp  (C≡C inner)
+            (0.929442, 0.498989, 0.0),  # sp  (C≡C outer)
+            (0.348422, 0.651072, 0.0),  # sp2 (benzene)
+            (0.200831, 0.798762, 0.0),  # sp  (C≡C inner)
+            (0.070694, 0.929142, 0.0),  # sp  (C≡C outer)
+            (0.499668, 0.651248, 0.0),  # sp2 (benzene)
+            (0.499296, 0.799074, 0.0),  # sp  (C≡C inner)
+            (0.498634, 0.929646, 0.0),  # sp  (C≡C outer)
+            (0.499922, 0.348407, 0.0),  # sp2 (benzene)
+            (0.500323, 0.200584, 0.0),  # sp  (C≡C inner)
+            (0.501068, 0.069985, 0.0),  # sp  (C≡C outer)
+            (0.651151, 0.348611, 0.0),  # sp2 (benzene)
+            (0.798896, 0.201072, 0.0),  # sp  (C≡C inner)
+            (0.929190, 0.070860, 0.0),  # sp  (C≡C outer)
         ])
         symbols = ['C'] * 18
-        positions = positions_frac @ cell   # producto matricial correcto
-        unit = Atoms(symbols=symbols, positions=positions, cell=cell, pbc=[True, True, False])
+        unit = Atoms(
+            symbols=symbols,
+            scaled_positions=positions_frac,  
+            cell=cell,
+            pbc=[True, True, False],
+        )
+        unit.center(vacuum=7.0, axis=2)     
     else:
         raise ValueError(f"Material '{material}' no reconocido. Opciones: 'GRPH', 'BGDY', 'GDY'")
     name = f"{n}x{n}"
