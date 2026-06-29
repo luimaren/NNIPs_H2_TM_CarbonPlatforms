@@ -1,6 +1,7 @@
 import os
 import time
 import numpy as np
+from tqdm import tqdm
 
 from ase.md.langevin import Langevin
 from ase.md.nose_hoover_chain import NoseHooverChainNVT
@@ -8,6 +9,7 @@ from ase.md.velocitydistribution import MaxwellBoltzmannDistribution,Stationary,
 from ase.io import Trajectory, write, read
 from ase.constraints import FixCartesian
 from ase import units
+
 
 def NoseHooverMD(
     init_conf,
